@@ -72,7 +72,7 @@ class NAYER(BaseSynthesis):
     def __init__(self, teacher, student, generator, num_classes, img_size,
                  init_dataset=None, g_steps=100, lr_g=0.1,
                  synthesis_batch_size=128, sample_batch_size=128,
-                 adv=0.0, bn=1, oh=1, contr=1,
+                 adv=0.0, bn=1, oh=1, num_workers=4, contr=1,
                  save_dir='run/fast', transform=None, autocast=None, use_fp16=False,
                  normalizer=None, device='cpu', distributed=False,
                  warmup=10, bn_mmt=0, bnt=30, oht=1.5,
@@ -88,6 +88,7 @@ class NAYER(BaseSynthesis):
         self.oh = oh
         self.contr = contr
         self.bn_mmt = bn_mmt
+        self.num_workers = num_workers
 
         self.num_classes = num_classes
         self.distributed = distributed
@@ -253,7 +254,7 @@ class NAYER(BaseSynthesis):
                 train_sampler = None
             loader = torch.utils.data.DataLoader(
                 dst, batch_size=self.sample_batch_size, shuffle=(train_sampler is None),
-                num_workers=4, pin_memory=True, sampler=train_sampler)
+                num_workers=self.num_workers, pin_memory=True, sampler=train_sampler)
             self.data_iter = DataIter(loader)
         return {"synthetic": bi_list}, end - start, best_cost, best_oh
 

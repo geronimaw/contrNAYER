@@ -64,6 +64,7 @@ parser.add_argument('--oht', default=3.0, type=float,
                     help='momentum when fitting batchnorm statistics')
 
 # Basic
+# FIXME: path without ".."
 parser.add_argument('--data_root', default='../datasets/')
 parser.add_argument('--teacher', default='resnet34')
 parser.add_argument('--student', default='resnet18')
@@ -268,6 +269,7 @@ def main_worker(gpu, ngpus_per_node, args):
     args.normalizer = datafree.utils.Normalizer(**registry.NORMALIZE_DICT[args.dataset])
     # pretrain = torch.load('checkpoints/pretrained/%s_%s.pth' % (args.dataset, args.teacher),
     #                                    map_location='cpu')['state_dict']
+    # FIXME: path without ".."
     if args.dataset != 'imagenet':
         teacher.load_state_dict(torch.load('../checkpoints/pretrained/%s_%s.pth' % (args.dataset, args.teacher),
                                            map_location='cpu')['state_dict'])
