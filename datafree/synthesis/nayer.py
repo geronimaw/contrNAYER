@@ -72,7 +72,7 @@ class NAYER(BaseSynthesis):
     def __init__(self, teacher, student, generator, num_classes, img_size,
                  init_dataset=None, g_steps=100, lr_g=0.1,
                  synthesis_batch_size=128, sample_batch_size=128,
-                 adv=0.0, bn=1, oh=1,
+                 adv=0.0, bn=1, oh=1, contr=1,
                  save_dir='run/fast', transform=None, autocast=None, use_fp16=False,
                  normalizer=None, device='cpu', distributed=False,
                  warmup=10, bn_mmt=0, bnt=30, oht=1.5,
@@ -86,6 +86,7 @@ class NAYER(BaseSynthesis):
         self.adv = adv
         self.bn = bn
         self.oh = oh
+        self.contr = contr
         self.bn_mmt = bn_mmt
 
         self.num_classes = num_classes
@@ -189,7 +190,19 @@ class NAYER(BaseSynthesis):
                 else:
                     inputs_aug = self.aug(inputs)
 
-                t_out = self.teacher(inputs_aug)
+                t_out = self.teacher(inputs)
+                t_out_aug = self.teacher(inputs_aug)
+                differences = torch.argmax(t_out, dim=1) != torch.argmax(t_out_aug, dim=1)
+                if torch.sum(differences).item() == 0:
+                    t_out = t_out_aug
+                else:
+                    # I want G to synthesize samples that produce the same response on T regardless of the augmentation
+                    # TODO: can semantics (inter-class similarities) be useful here?
+                    # TODO: check if self.aug is used during T training. the end-user cannot know what augmentations were used   
+                    # add a loss term that penalizes G in this case
+                    num_differences = torch.sum(differences) # .item()
+                    loss_contr = num_differences / t_out.size()[0]
+
                 loss_bn = sum([h.r_feature for h in self.hooks])
                 loss_oh = custom_cross_entropy(t_out, ys.detach())
 
@@ -201,13 +214,15 @@ class NAYER(BaseSynthesis):
                 else:
                     loss_adv = loss_oh.new_zeros(1)
 
-                loss = self.bn * loss_bn + self.oh * loss_oh + self.adv * loss_adv
+                loss = self.bn * loss_bn + self.oh * loss_oh + self.adv * loss_adv + self.contr + loss_contr
 
                 if loss_oh.item() < best_oh:
                     best_oh = loss_oh
 
-                print("%s - bn %s - bn %s - oh %s - adv %s" % (
-                it, (loss_bn * self.bn).data, loss_bn.data, (loss_oh).data, (self.adv * loss_adv).data))
+                # print("%s - bn %s - bn %s - oh %s - adv %s" % (
+                # it, (loss_bn * self.bn).data, loss_bn.data, (loss_oh).data, (self.adv * loss_adv).data))
+                print("%s - bn %s - oh %s - contr %s - adv %s" % (
+                it, (loss_bn * self.bn).data, (loss_oh * self.oh).data, (self.contr * loss_contr).data, (self.adv * loss_adv).data))
 
                 with torch.no_grad():
                     if best_cost > loss.item() or best_inputs is None:

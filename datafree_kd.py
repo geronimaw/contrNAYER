@@ -26,13 +26,15 @@ import torchvision.datasets as datasets
 import torchvision.models as models
 import wandb
 
-parser = argparse.ArgumentParser(description='Data-free Knowledge Distillation')
+parser = argparse.ArgumentParser(description=' Contrastive Data-free Knowledge Distillation')
 
 # Data Free
-parser.add_argument('--method', default='nldf', choices=['nldf'])
+parser.add_argument('--method', default='nldf')
 parser.add_argument('--adv', default=1.33, type=float, help='scaling factor for adversarial distillation')
 parser.add_argument('--bn', default=10, type=float, help='scaling factor for BN regularization')
 parser.add_argument('--oh', default=0.5, type=float, help='scaling factor for one hot loss (cross entropy)')
+# TODO: optimize contr. now set to 0.5
+parser.add_argument('--contr', default=0.5, type=float, help='scaling factor for contrastive loss (augmentation-based)')
 parser.add_argument('--act', default=0, type=float, help='scaling factor for activation loss used in DAFL')
 parser.add_argument('--balance', default=0, type=float, help='scaling factor for class balance')
 parser.add_argument('--save_dir', default='run/', type=str)
@@ -62,7 +64,7 @@ parser.add_argument('--oht', default=3.0, type=float,
                     help='momentum when fitting batchnorm statistics')
 
 # Basic
-parser.add_argument('--data_root', default='/datasets/')
+parser.add_argument('--data_root', default='../datasets/')
 parser.add_argument('--teacher', default='resnet34')
 parser.add_argument('--student', default='resnet18')
 parser.add_argument('--dataset', default='cifar10', choices=['cifar10', 'cifar100', 'tiny_imagenet', 'imagenet'])
@@ -210,7 +212,7 @@ def main_worker(gpu, ngpus_per_node, args):
 
     name_project = 'datafree-%s/log-%s-%s-%s%s.txt' % (
     args.method, args.dataset, args.teacher, args.student, args.log_tag)
-    wandb.init(project="FastDFKD",
+    wandb.init(project="contrNAYER",
                name=name_project,
                tags="t1",
                config=args.__dict__)
@@ -267,7 +269,7 @@ def main_worker(gpu, ngpus_per_node, args):
     # pretrain = torch.load('checkpoints/pretrained/%s_%s.pth' % (args.dataset, args.teacher),
     #                                    map_location='cpu')['state_dict']
     if args.dataset != 'imagenet':
-        teacher.load_state_dict(torch.load('checkpoints/pretrained/%s_%s.pth' % (args.dataset, args.teacher),
+        teacher.load_state_dict(torch.load('../checkpoints/pretrained/%s_%s.pth' % (args.dataset, args.teacher),
                                            map_location='cpu')['state_dict'])
     student = prepare_model(student)
     teacher = prepare_model(teacher)
@@ -297,7 +299,7 @@ def main_worker(gpu, ngpus_per_node, args):
                                                   synthesis_batch_size=args.synthesis_batch_size,
                                                   sample_batch_size=args.batch_size,
                                                   g_steps=args.g_steps, warmup=args.warmup, lr_g=args.lr_g, adv=args.adv,
-                                                  bn=args.bn, oh=args.oh, bn_mmt=args.bn_mmt,
+                                                  bn=args.bn, oh=args.oh, bn_mmt=args.bn_mmt, contr=args.contr,
                                                   g_life=args.g_life, g_loops=args.g_loops, gwp_loops=args.gwp_loops)
         elif args.dataset == 'tiny_imagenet':
             generator = datafree.models.generator.NLGenerator(ngf=64, img_size=64, nc=3, nl=num_classes,
