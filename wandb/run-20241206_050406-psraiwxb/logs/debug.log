@@ -1,0 +1,26 @@
+2024-12-06 05:04:06,744 INFO    MainThread:46967 [wandb_setup.py:_flush():79] Current SDK version is 0.18.7
+2024-12-06 05:04:06,746 INFO    MainThread:46967 [wandb_setup.py:_flush():79] Configure stats pid to 46967
+2024-12-06 05:04:06,747 INFO    MainThread:46967 [wandb_setup.py:_flush():79] Loading settings from /home/devcontainers/.config/wandb/settings
+2024-12-06 05:04:06,749 INFO    MainThread:46967 [wandb_setup.py:_flush():79] Loading settings from /mnt/c/Users/aless/Desktop/DFKD/NAYER/wandb/settings
+2024-12-06 05:04:06,750 INFO    MainThread:46967 [wandb_setup.py:_flush():79] Loading settings from environment variables: {}
+2024-12-06 05:04:06,752 INFO    MainThread:46967 [wandb_setup.py:_flush():79] Applying setup settings: {'mode': None, '_disable_service': None}
+2024-12-06 05:04:06,808 INFO    MainThread:46967 [wandb_setup.py:_flush():79] Inferring run settings from compute environment: {'program_relpath': 'datafree_kd.py', 'program_abspath': '/mnt/c/Users/aless/Desktop/DFKD/NAYER/datafree_kd.py', 'program': '/mnt/c/Users/aless/Desktop/DFKD/NAYER/datafree_kd.py'}
+2024-12-06 05:04:06,810 INFO    MainThread:46967 [wandb_setup.py:_flush():79] Applying login settings: {}
+2024-12-06 05:04:06,813 INFO    MainThread:46967 [wandb_init.py:_log_setup():533] Logging user logs to /mnt/c/Users/aless/Desktop/DFKD/NAYER/wandb/run-20241206_050406-psraiwxb/logs/debug.log
+2024-12-06 05:04:06,816 INFO    MainThread:46967 [wandb_init.py:_log_setup():534] Logging internal logs to /mnt/c/Users/aless/Desktop/DFKD/NAYER/wandb/run-20241206_050406-psraiwxb/logs/debug-internal.log
+2024-12-06 05:04:06,818 INFO    MainThread:46967 [wandb_init.py:init():619] calling init triggers
+2024-12-06 05:04:06,820 INFO    MainThread:46967 [wandb_init.py:init():626] wandb.init called with sweep_config: {}
+config: {'method': 'nayer', 'adv': 1.33, 'bn': 10.0, 'oh': 0.5, 'contr': 0.5, 'act': 0, 'balance': 0, 'save_dir': 'run/c10r34r18-nayerc10r34r18-nayer-ep120', 'cmi_init': None, 'bn_mmt': 0.9, 'log_tag': '-c10r34r18-nayer-ep120', 'epochs': 120, 'warmup': 20, 'g_steps': 30, 'g_life': 10, 'g_loops': 2, 'gwp_loops': 10, 'lr_g': 0.004, 'le_emb_size': 1000, 'bnt': 20, 'oht': 3.0, 'data_root': '../datasets/', 'teacher': 'resnet34', 'student': 'resnet18', 'dataset': 'cifar10', 'lr': 0.2, 'eta_min': 0.0002, 'T': 20, 'kd_steps': 400, 'ep_steps': 400, 'resume': '', 'evaluate_only': False, 'batch_size': 512, 'synthesis_batch_size': 400, 'gpu': 0, 'world_size': -1, 'rank': -1, 'dist_url': 'tcp://224.66.41.62:23456', 'dist_backend': 'nccl', 'multiprocessing_distributed': False, 'fp16': False, 'seed': 0, 'workers': 4, 'start_epoch': 0, 'momentum': 0.9, 'weight_decay': 0.0001, 'print_freq': 0, 'pretrained': False, 'distributed': False, 'ngpus_per_node': 1, 'autocast': <function dummy_ctx at 0x7f62bef55760>, 'logger': <Logger cifar10-resnet34-resnet18 (DEBUG)>}
+2024-12-06 05:04:06,821 INFO    MainThread:46967 [wandb_init.py:init():669] starting backend
+2024-12-06 05:04:06,823 INFO    MainThread:46967 [wandb_init.py:init():673] sending inform_init request
+2024-12-06 05:04:06,860 INFO    MainThread:46967 [backend.py:_multiprocessing_setup():104] multiprocessing start_methods=fork,spawn,forkserver, using: spawn
+2024-12-06 05:04:06,864 INFO    MainThread:46967 [wandb_init.py:init():686] backend started and connected
+2024-12-06 05:04:06,896 INFO    MainThread:46967 [wandb_init.py:init():781] updated telemetry
+2024-12-06 05:04:07,043 INFO    MainThread:46967 [wandb_init.py:init():814] communicating run to backend with 90.0 second timeout
+2024-12-06 05:04:08,826 INFO    MainThread:46967 [wandb_init.py:init():867] starting run threads in backend
+2024-12-06 05:04:09,032 INFO    MainThread:46967 [wandb_run.py:_console_start():2456] atexit reg
+2024-12-06 05:04:09,033 INFO    MainThread:46967 [wandb_run.py:_redirect():2305] redirect: wrap_raw
+2024-12-06 05:04:09,034 INFO    MainThread:46967 [wandb_run.py:_redirect():2370] Wrapping output streams.
+2024-12-06 05:04:09,035 INFO    MainThread:46967 [wandb_run.py:_redirect():2395] Redirects installed.
+2024-12-06 05:04:09,038 INFO    MainThread:46967 [wandb_init.py:init():911] run started, returning control to user process
+2024-12-06 05:05:31,680 WARNING MsgRouterThr:46967 [router.py:message_loop():75] message_loop has been closed
