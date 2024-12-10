@@ -1,0 +1,126 @@
+_wandb:
+    value:
+        cli_version: 0.18.7
+        m: []
+        python_version: 3.13.0
+        t:
+            "1":
+                - 55
+            "2":
+                - 55
+            "3":
+                - 2
+                - 3
+                - 13
+                - 16
+                - 23
+                - 55
+            "4": 3.13.0
+            "5": 0.18.7
+            "8":
+                - 2
+                - 5
+            "12": 0.18.7
+            "13": linux-x86_64
+T:
+    value: 20
+act:
+    value: 0
+adv:
+    value: 1.33
+autocast:
+    value: datafree.utils._utils.dummy_ctx
+balance:
+    value: 0
+batch_size:
+    value: 512
+bn:
+    value: 10
+bn_mmt:
+    value: 0.9
+bnt:
+    value: 20
+cmi_init:
+    value: null
+data_root:
+    value: ./datasets/
+dataset:
+    value: cifar10
+dist_backend:
+    value: nccl
+dist_url:
+    value: tcp://224.66.41.62:23456
+distributed:
+    value: false
+ep_steps:
+    value: 400
+epochs:
+    value: 120
+eta_min:
+    value: 0.0002
+evaluate_only:
+    value: false
+fp16:
+    value: false
+g_life:
+    value: 10
+g_loops:
+    value: 2
+g_steps:
+    value: 30
+gpu:
+    value: 0
+gwp_loops:
+    value: 10
+kd_steps:
+    value: 400
+le_emb_size:
+    value: 1000
+log_tag:
+    value: -c10r34r18-nayer-ep120
+logger:
+    value: <Logger cifar10-resnet34-resnet18 (DEBUG)>
+lr:
+    value: 0.2
+lr_g:
+    value: 0.004
+method:
+    value: nayer
+momentum:
+    value: 0.9
+multiprocessing_distributed:
+    value: false
+ngpus_per_node:
+    value: 1
+oh:
+    value: 0.5
+oht:
+    value: 3
+pretrained:
+    value: false
+print_freq:
+    value: 0
+rank:
+    value: -1
+resume:
+    value: ""
+save_dir:
+    value: run/c10r34r18-nayerc10r34r18-nayer-ep120
+seed:
+    value: 0
+start_epoch:
+    value: 0
+student:
+    value: resnet18
+synthesis_batch_size:
+    value: 400
+teacher:
+    value: resnet34
+warmup:
+    value: 20
+weight_decay:
+    value: 0.0001
+workers:
+    value: 4
+world_size:
+    value: -1
