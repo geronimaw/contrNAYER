@@ -127,8 +127,10 @@ class NAYER(BaseSynthesis):
             ])
         else:
             self.aug = transforms.Compose([
-                augmentation.RandomCrop(size=[self.img_size[-2], self.img_size[-1]], padding=4),
+                augmentation.RandomCrop(size=[self.img_size[-2], self.img_size[-1]], padding=4, p=0.5),
                 augmentation.RandomHorizontalFlip(),
+                augmentation.RandomRotation(degrees=20),
+                augmentation.ColorJitter(0.2, 0.1, 0.1, 0.1, p=0.5),
                 normalizer,
             ])
 
