@@ -133,6 +133,8 @@ parser.add_argument('--pretrained', dest='pretrained', action='store_true',
                     help='use pre-trained model')
 parser.add_argument('--wandb', default='online', type=str)
 parser.add_argument('--new_aug', default=False, type=bool)
+parser.add_argument('--contr_loss', default="KLD", type=str)
+parser.add_argument('--temperature', default=0.2, type=float)
 
 best_acc1 = 0
 time_cost = 0
@@ -202,9 +204,9 @@ def main_worker(gpu, ngpus_per_node, args):
     ############################################
     # Logger
     ############################################
-    if args.log_tag != '':
-        args.log_tag = '-' + args.log_tag
-    log_name = 'R%d-%s-%s-%s%s' % (args.rank, args.dataset, args.teacher, args.student, args.log_tag) \
+    # if args.log_tag != '':
+    #     args.log_tag = '-' + args.log_tag
+    log_name = 'R%d-%s-%s-%s-%s' % (args.rank, args.dataset, args.teacher, args.student, args.log_tag) \
         if args.multiprocessing_distributed else '%s-%s-%s' % (args.dataset, args.teacher, args.student)
     args.logger = datafree.utils.logger.get_logger(log_name, output='checkpoints/datafree-%s/log-%s-%s-%s%s.txt'
                                                                     % (args.method, args.dataset, args.teacher,
@@ -213,8 +215,7 @@ def main_worker(gpu, ngpus_per_node, args):
         for k, v in datafree.utils.flatten_dict(vars(args)).items():  # print args
             args.logger.info("%s: %s" % (k, v))
 
-    name_project = 'datafree-%s/log-%s-%s-%s%s.txt' % (
-    args.method, args.dataset, args.teacher, args.student, args.log_tag)
+    name_project = f'{args.log_tag}.txt'
     wandb.init(project="contrNAYER",
                name=name_project,
                tags="t1",
@@ -297,12 +298,12 @@ def main_worker(gpu, ngpus_per_node, args):
                                                              label_emb=label_emb, le_emb_size=args.le_emb_size,
                                                              sbz=args.synthesis_batch_size)
             generator = prepare_model(generator)
-            synthesizer = datafree.synthesis.NAYER(teacher, student, generator,
+            synthesizer = datafree.synthesis.NAYER(teacher, student, generator, contr_loss=args.contr_loss,
                                                   num_classes=num_classes, img_size=(3, 32, 32), init_dataset=args.cmi_init,
                                                   save_dir=args.save_dir, device=args.gpu, transform=ori_dataset.transform,
                                                   normalizer=args.normalizer, num_workers=args.workers,
                                                   synthesis_batch_size=args.synthesis_batch_size,
-                                                  sample_batch_size=args.batch_size,
+                                                  sample_batch_size=args.batch_size, temperature=args.temperature,
                                                   g_steps=args.g_steps, warmup=args.warmup, lr_g=args.lr_g, adv=args.adv,
                                                   bn=args.bn, oh=args.oh, bn_mmt=args.bn_mmt, contr=args.contr,
                                                   g_life=args.g_life, g_loops=args.g_loops, gwp_loops=args.gwp_loops)

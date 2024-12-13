@@ -70,12 +70,12 @@ def custom_cross_entropy(preds, target):
 
 class NAYER(BaseSynthesis):
     def __init__(self, teacher, student, generator, num_classes, img_size,
-                 init_dataset=None, g_steps=100, lr_g=0.1,
+                 init_dataset=None, g_steps=100, lr_g=0.1, contr_loss="KLD",
                  synthesis_batch_size=128, sample_batch_size=128,
                  adv=0.0, bn=1, oh=1, num_workers=4, contr=1, new_aug=False,
                  save_dir='run/fast', transform=None, autocast=None, use_fp16=False,
                  normalizer=None, device='cpu', distributed=False,
-                 warmup=10, bn_mmt=0, bnt=30, oht=1.5,
+                 warmup=10, bn_mmt=0, bnt=30, oht=1.5, temperature=1,
                  cr_loop=1, g_life=50, g_loops=1, gwp_loops=10, dataset="cifar10"):
         super(NAYER, self).__init__(teacher, student)
         self.save_dir = save_dir
@@ -90,6 +90,8 @@ class NAYER(BaseSynthesis):
         self.bn_mmt = bn_mmt
         self.num_workers = num_workers
         self.new_aug = new_aug
+        self.contr_loss = contr_loss
+        self.temp = temperature
 
         self.num_classes = num_classes
         self.distributed = distributed
@@ -204,16 +206,22 @@ class NAYER(BaseSynthesis):
 
                 t_out = self.teacher(inputs)
                 t_out_aug = self.teacher(inputs_aug)
-                differences = torch.argmax(t_out, dim=1) != torch.argmax(t_out_aug, dim=1)
-                if torch.sum(differences).item() == 0:
-                    t_out = t_out_aug
-                else:
-                    # I want G to synthesize samples that produce the same response on T regardless of the augmentation
-                    # TODO: can semantics (inter-class similarities) be useful here?
-                    # TODO: check if self.aug is used during T training. the end-user cannot know what augmentations were used   
-                    # add a loss term that penalizes G in this case
-                    num_differences = torch.sum(differences) # .item()
-                    loss_contr = num_differences / t_out.size()[0]
+
+                if self.contr_loss == "MSE":
+                    differences = torch.argmax(t_out, dim=1) != torch.argmax(t_out_aug, dim=1)
+                    if torch.sum(differences).item() == 0:
+                        t_out = t_out_aug
+                    else:
+                        # I want G to synthesize samples that produce the same response on T regardless of the augmentation
+                        # TODO: can semantics (inter-class similarities) be useful here?
+                        # TODO: check if self.aug is used during T training. the end-user cannot know what augmentations were used   
+                        # add a loss term that penalizes G in this case
+                        num_differences = torch.sum(differences) # .item()
+                        loss_contr = num_differences / t_out.size()[0]
+                elif self.contr_loss == "KLD":
+                    loss_contr = F.kl_div(F.log_softmax(t_out_aug/self.temp, dim=-1), 
+                                          F.softmax(t_out/self.temp, dim=-1), 
+                                          reduction='batchmean')
 
                 loss_bn = sum([h.r_feature for h in self.hooks])
                 loss_oh = custom_cross_entropy(t_out, ys.detach())
