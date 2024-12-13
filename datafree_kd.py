@@ -134,7 +134,7 @@ parser.add_argument('--pretrained', dest='pretrained', action='store_true',
 parser.add_argument('--wandb', default='online', type=str)
 parser.add_argument('--new_aug', default=False, type=bool)
 parser.add_argument('--contr_loss', default="KLD", type=str)
-parser.add_argument('--temperature', default=0.2, type=float)
+parser.add_argument('--temperature', default=2, type=float)
 
 best_acc1 = 0
 time_cost = 0

@@ -37,9 +37,9 @@ python datafree_kd.py --batch_size 512 --synthesis_batch_size 400 --lr 0.2 --gpu
 ### CIFAR10
 # c10r34r18
 python datafree_kd.py --batch_size 512 --synthesis_batch_size 400 --lr 0.2 --gpu 0 --warmup 20 --epochs 120 \
---dataset cifar10 --method nayer --lr_g 4e-3 --teacher resnet34 --student resnet18 --save_dir run/c10r34r18-nayer \
+--dataset cifar10 --method nayer --lr_g 4e-3 --teacher resnet34 --student resnet18 --save_dir run/c10r34r18-nayer/KLD03 \
 --adv 1.33 --bn 10.0 --oh 0.5 --contr 0.6 --g_steps 30 --g_life 10 --g_loops 2 --gwp_loops 10 \
---log_tag c10r34r18-ep120 --contr_loss KLD --temperature 0.3
+--log_tag c10r34r18-ep120-KLD03 --contr_loss KLD --temperature 0.3
 
 # c10w402w161
 python datafree_kd.py --batch_size 512 --synthesis_batch_size 400 --lr 0.2 --gpu 0 --warmup 20 --epochs 120 \
