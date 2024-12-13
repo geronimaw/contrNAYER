@@ -72,7 +72,7 @@ class NAYER(BaseSynthesis):
     def __init__(self, teacher, student, generator, num_classes, img_size,
                  init_dataset=None, g_steps=100, lr_g=0.1,
                  synthesis_batch_size=128, sample_batch_size=128,
-                 adv=0.0, bn=1, oh=1, num_workers=4, contr=1,
+                 adv=0.0, bn=1, oh=1, num_workers=4, contr=1, new_aug=False,
                  save_dir='run/fast', transform=None, autocast=None, use_fp16=False,
                  normalizer=None, device='cpu', distributed=False,
                  warmup=10, bn_mmt=0, bnt=30, oht=1.5,
@@ -89,6 +89,7 @@ class NAYER(BaseSynthesis):
         self.contr = contr
         self.bn_mmt = bn_mmt
         self.num_workers = num_workers
+        self.new_aug = new_aug
 
         self.num_classes = num_classes
         self.distributed = distributed
@@ -126,13 +127,20 @@ class NAYER(BaseSynthesis):
                 normalizer,
             ])
         else:
-            self.aug = transforms.Compose([
-                augmentation.RandomCrop(size=[self.img_size[-2], self.img_size[-1]], padding=4, p=0.5),
-                augmentation.RandomHorizontalFlip(),
-                augmentation.RandomRotation(degrees=20),
-                augmentation.ColorJitter(0.2, 0.1, 0.1, 0.1, p=0.5),
-                normalizer,
-            ])
+            if self.new_aug:
+                self.aug = transforms.Compose([
+                    augmentation.RandomCrop(size=[self.img_size[-2], self.img_size[-1]], padding=4, p=0.5),
+                    augmentation.RandomHorizontalFlip(),
+                    augmentation.RandomRotation(degrees=20),
+                    augmentation.ColorJitter(0.2, 0.1, 0.1, 0.1, p=0.5),
+                    normalizer,
+                ])
+            else:
+                self.aug = transforms.Compose([
+                    augmentation.RandomCrop(size=[self.img_size[-2], self.img_size[-1]], padding=4, p=0.5),
+                    augmentation.RandomHorizontalFlip(),
+                    normalizer,
+                ])
 
     def jitter_and_flip(self, inputs_jit, lim=1. / 8., do_flip=True):
         lim_0, lim_1 = int(inputs_jit.shape[-2] * lim), int(inputs_jit.shape[-1] * lim)

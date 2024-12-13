@@ -132,6 +132,7 @@ parser.add_argument('-p', '--print_freq', default=0, type=int,
 parser.add_argument('--pretrained', dest='pretrained', action='store_true',
                     help='use pre-trained model')
 parser.add_argument('--wandb', default='online', type=str)
+parser.add_argument('--new_aug', default=False, type=bool)
 
 best_acc1 = 0
 time_cost = 0
