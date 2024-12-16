@@ -247,8 +247,9 @@ class NAYER(BaseSynthesis):
 
                 if loss_oh.item() < best_oh:
                     best_oh = loss_oh
-                if loss_contr.item() < best_contr:
-                    best_contr = loss_contr
+                if self.contr != 0:
+                    if loss_contr.item() < best_contr:
+                        best_contr = loss_contr
 
                 # print("%s - bn %s - bn %s - oh %s - adv %s" % (
                 # it, (loss_bn * self.bn).data, loss_bn.data, (loss_oh).data, (self.adv * loss_adv).data))
