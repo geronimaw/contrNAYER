@@ -135,6 +135,7 @@ parser.add_argument('--wandb', default='online', type=str)
 parser.add_argument('--new_aug', default=False, type=bool)
 parser.add_argument('--contr_loss', default="KLD", type=str)
 parser.add_argument('--temperature', default=2, type=float)
+parser.add_argument('--contr_on_stud', default=False, type=bool)
 
 best_acc1 = 0
 time_cost = 0
@@ -143,7 +144,7 @@ time_cost = 0
 def main():
     args = parser.parse_args()
 
-    args.save_dir = args.save_dir + args.log_tag
+    args.save_dir = os.path.join(args.save_dir, args.log_tag)
     if args.seed is not None:
         random.seed(args.seed)
         torch.manual_seed(args.seed)
@@ -302,7 +303,7 @@ def main_worker(gpu, ngpus_per_node, args):
                                                   num_classes=num_classes, img_size=(3, 32, 32), init_dataset=args.cmi_init,
                                                   save_dir=args.save_dir, device=args.gpu, transform=ori_dataset.transform,
                                                   normalizer=args.normalizer, num_workers=args.workers,
-                                                  synthesis_batch_size=args.synthesis_batch_size,
+                                                  synthesis_batch_size=args.synthesis_batch_size, contr_on_stud=args.contr_on_stud,
                                                   sample_batch_size=args.batch_size, temperature=args.temperature,
                                                   g_steps=args.g_steps, warmup=args.warmup, lr_g=args.lr_g, adv=args.adv,
                                                   bn=args.bn, oh=args.oh, bn_mmt=args.bn_mmt, contr=args.contr,

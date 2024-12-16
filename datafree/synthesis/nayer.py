@@ -74,7 +74,7 @@ class NAYER(BaseSynthesis):
                  synthesis_batch_size=128, sample_batch_size=128,
                  adv=0.0, bn=1, oh=1, num_workers=4, contr=1, new_aug=False,
                  save_dir='run/fast', transform=None, autocast=None, use_fp16=False,
-                 normalizer=None, device='cpu', distributed=False,
+                 normalizer=None, device='cpu', distributed=False, contr_on_stud=False,
                  warmup=10, bn_mmt=0, bnt=30, oht=1.5, temperature=1,
                  cr_loop=1, g_life=50, g_loops=1, gwp_loops=10, dataset="cifar10"):
         super(NAYER, self).__init__(teacher, student)
@@ -92,6 +92,7 @@ class NAYER(BaseSynthesis):
         self.new_aug = new_aug
         self.contr_loss = contr_loss
         self.temp = temperature
+        self.contr_on_stud = contr_on_stud
 
         self.num_classes = num_classes
         self.distributed = distributed
@@ -227,7 +228,16 @@ class NAYER(BaseSynthesis):
                 loss_oh = custom_cross_entropy(t_out, ys.detach())
 
                 if self.adv > 0 and (self.ep > self.ep_start):
-                    s_out = self.student(inputs_aug)
+                    if self.contr_on_stud:
+                        s_out = self.student(inputs)
+                        s_out_aug = self.student(inputs_aug)
+                        if self.contr_loss == "KLD":
+                            loss_contr += F.kl_div(F.log_softmax(s_out_aug/self.temp, dim=-1), 
+                                                F.softmax(s_out/self.temp, dim=-1), 
+                                                reduction='batchmean')
+                    else:
+                        s_out = self.student(inputs_aug)
+
                     mask = (s_out.max(1)[1] == t_out.max(1)[1]).float()
                     loss_adv = -(kldiv(s_out, t_out, reduction='none').sum(
                         1) * mask).mean()  # decision adversarial distillation
