@@ -205,32 +205,29 @@ class NAYER(BaseSynthesis):
                 else:
                     inputs_aug = self.aug(inputs)
 
-                t_out = self.teacher(inputs)
-                t_out_aug = self.teacher(inputs_aug)
-
-                if self.contr_loss == "MSE":
-                    differences = torch.argmax(t_out, dim=1) != torch.argmax(t_out_aug, dim=1)
-                    if torch.sum(differences).item() == 0:
-                        t_out = t_out_aug
-                    else:
-                        # I want G to synthesize samples that produce the same response on T regardless of the augmentation
-                        # TODO: can semantics (inter-class similarities) be useful here?
-                        # TODO: check if self.aug is used during T training. the end-user cannot know what augmentations were used   
-                        # add a loss term that penalizes G in this case
+                t_out = self.teacher(inputs_aug)
+                
+                if self.contr != 0:
+                    t_out_aug = self.teacher(inputs)
+                    # I want G to synthesize samples that produce the same response on T regardless of the augmentation
+                    # TODO: can semantics (inter-class similarities) be useful here?
+                    if self.contr_loss == "MSE":
+                        differences = torch.argmax(t_out, dim=1) != torch.argmax(t_out_aug, dim=1)
                         num_differences = torch.sum(differences) # .item()
                         loss_contr = num_differences / t_out.size()[0]
-                elif self.contr_loss == "KLD":
-                    loss_contr = F.kl_div(F.log_softmax(t_out_aug/self.temp, dim=-1), 
-                                          F.softmax(t_out/self.temp, dim=-1), 
-                                          reduction='batchmean')
+                    elif self.contr_loss == "KLD":
+                        loss_contr = F.kl_div(F.log_softmax(t_out_aug/self.temp, dim=-1), 
+                                            F.softmax(t_out/self.temp, dim=-1), 
+                                            reduction='batchmean')
+                    t_out = t_out_aug
 
                 loss_bn = sum([h.r_feature for h in self.hooks])
                 loss_oh = custom_cross_entropy(t_out, ys.detach())
 
                 if self.adv > 0 and (self.ep > self.ep_start):
-                    if self.contr_on_stud:
-                        s_out = self.student(inputs)
-                        s_out_aug = self.student(inputs_aug)
+                    if self.contr != 0 and self.contr_on_stud:
+                        s_out = self.student(inputs_aug)
+                        s_out_aug = self.student(inputs)
                         if self.contr_loss == "KLD":
                             loss_contr += F.kl_div(F.log_softmax(s_out_aug/self.temp, dim=-1), 
                                                 F.softmax(s_out/self.temp, dim=-1), 
@@ -244,7 +241,7 @@ class NAYER(BaseSynthesis):
                 else:
                     loss_adv = loss_oh.new_zeros(1)
 
-                loss = self.bn * loss_bn + self.oh * loss_oh + self.adv * loss_adv + self.contr + loss_contr
+                loss = self.bn * loss_bn + self.oh * loss_oh + self.adv * loss_adv + self.contr * loss_contr
 
                 if loss_oh.item() < best_oh:
                     best_oh = loss_oh
