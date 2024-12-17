@@ -291,7 +291,7 @@ class NAYER(BaseSynthesis):
                 dst, batch_size=self.sample_batch_size, shuffle=(train_sampler is None),
                 num_workers=self.num_workers, pin_memory=True, sampler=train_sampler)
             self.data_iter = DataIter(loader)
-        return {"synthetic": bi_list}, end - start, best_cost, best_oh, best_contr
+        return {"synthetic": bi_list}, end - start, best_cost, best_oh, best_contr if self.contr != 0 else 0
 
     def sample(self):
         return self.data_iter.next()
