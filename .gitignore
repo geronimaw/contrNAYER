@@ -5,3 +5,4 @@ wandb-metadata.json
 config.yaml
 copy_wandb_run.py
 run/
+checkpoints/
