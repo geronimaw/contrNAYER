@@ -409,7 +409,6 @@ def main_worker(gpu, ngpus_per_node, args):
             train(synthesizer, [student, teacher], criterion, optimizer, args)  # kd_steps
         tm = time.time() - tm
 
-
         student.eval()
         if epoch >= args.warmup:
             eval_results = evaluator(student, device=args.gpu)
