@@ -167,6 +167,7 @@ class NAYER(BaseSynthesis):
         best_oh = 1e6
         best_contr = 1e6
         best_adv = 1e6
+        best_bn = 1e6
 
         if (self.ep - self.ep_start) % self.g_life == 0 or self.ep % self.g_life == 0:
             self.generator = self.generator.reinit()
@@ -247,6 +248,8 @@ class NAYER(BaseSynthesis):
 
                 if loss_oh.item() < best_oh:
                     best_oh = loss_oh
+                if loss_bn.item() < best_bn:
+                    best_bn = loss_bn
                 if loss_adv.item() < best_adv:
                     best_adv = loss_adv
                 if loss_contr.item() < best_contr:
@@ -288,7 +291,7 @@ class NAYER(BaseSynthesis):
                 dst, batch_size=self.sample_batch_size, shuffle=(train_sampler is None),
                 num_workers=self.num_workers, pin_memory=True, sampler=train_sampler)
             self.data_iter = DataIter(loader)
-        return {"synthetic": bi_list}, end - start, best_cost, best_oh, best_contr, best_adv
+        return {"synthetic": bi_list}, end - start, best_cost, best_oh, best_contr, best_adv, best_bn
 
     def sample(self):
         return self.data_iter.next()
