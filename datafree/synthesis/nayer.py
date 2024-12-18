@@ -132,7 +132,7 @@ class NAYER(BaseSynthesis):
         else:
             if self.new_aug:
                 self.aug = transforms.Compose([
-                    augmentation.RandomCrop(size=[self.img_size[-2], self.img_size[-1]], padding=4, p=0.5),
+                    augmentation.RandomCrop(size=[self.img_size[-2], self.img_size[-1]], padding=4),
                     augmentation.RandomHorizontalFlip(),
                     augmentation.RandomRotation(degrees=20),
                     augmentation.ColorJitter(0.2, 0.1, 0.1, 0.1, p=0.5),
@@ -140,7 +140,7 @@ class NAYER(BaseSynthesis):
                 ])
             else:
                 self.aug = transforms.Compose([
-                    augmentation.RandomCrop(size=[self.img_size[-2], self.img_size[-1]], padding=4, p=0.5),
+                    augmentation.RandomCrop(size=[self.img_size[-2], self.img_size[-1]], padding=4),
                     augmentation.RandomHorizontalFlip(),
                     normalizer,
                 ])
@@ -219,7 +219,6 @@ class NAYER(BaseSynthesis):
                         loss_contr = F.kl_div(F.log_softmax(t_out_aug/self.temp, dim=-1), 
                                             F.softmax(t_out/self.temp, dim=-1), 
                                             reduction='batchmean')
-                    t_out = t_out_aug
                 else:
                     loss_contr = 0
 
@@ -247,18 +246,13 @@ class NAYER(BaseSynthesis):
 
                 if loss_oh.item() < best_oh:
                     best_oh = loss_oh
-                if self.contr != 0:
-                    if loss_contr.item() < best_contr:
-                        best_contr = loss_contr
+                if loss_contr.item() < best_contr:
+                    best_contr = loss_contr
 
-                if self.contr == 0:
-                    print("%s - bn %s - oh %s - contr 0 - adv %s" % (
-                    it, (loss_bn * self.bn).data, (loss_oh * self.oh).data, (self.adv * loss_adv).data))
                 # print("%s - bn %s - bn %s - oh %s - adv %s" % (
                 # it, (loss_bn * self.bn).data, loss_bn.data, (loss_oh).data, (self.adv * loss_adv).data))
-                else:
-                    print("%s - bn %s - oh %s - contr %s - adv %s" % (
-                    it, (loss_bn * self.bn).data, (loss_oh * self.oh).data, (self.contr * loss_contr).data, (self.adv * loss_adv).data))
+                print("%s - bn %s - oh %s - contr %s - adv %s" % (
+                it, (loss_bn * self.bn).data, (loss_oh * self.oh).data, (self.contr * loss_contr).data, (self.adv * loss_adv).data))
 
                 with torch.no_grad():
                     if best_cost > loss.item() or best_inputs is None:
@@ -291,7 +285,7 @@ class NAYER(BaseSynthesis):
                 dst, batch_size=self.sample_batch_size, shuffle=(train_sampler is None),
                 num_workers=self.num_workers, pin_memory=True, sampler=train_sampler)
             self.data_iter = DataIter(loader)
-        return {"synthetic": bi_list}, end - start, best_cost, best_oh, best_contr if self.contr != 0 else 0
+        return {"synthetic": bi_list}, end - start, best_cost, best_oh, best_contr
 
     def sample(self):
         return self.data_iter.next()
