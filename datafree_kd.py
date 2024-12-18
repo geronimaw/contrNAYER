@@ -390,7 +390,7 @@ def main_worker(gpu, ngpus_per_node, args):
         tm = time.time()
         args.current_epoch = epoch
 
-        vis_results, cost, loss_synthesizer, loss_oh, loss_contr = synthesizer.synthesize()  # g_steps
+        vis_results, cost, loss_synthesizer, loss_oh, loss_contr, loss_adv = synthesizer.synthesize()  # g_steps
         # if vis_results is not None:
         #     for vis_name, vis_image in vis_results.items():
         #         str_epoch = str(epoch)
@@ -423,7 +423,7 @@ def main_worker(gpu, ngpus_per_node, args):
                                                                         sl=loss_synthesizer, oh=loss_oh, contr=loss_contr,
                                                                         co=cost, tm=tm))
         wandb.log({"Acc1": acc1, "Acc5": acc5, "VLoss": val_loss, "lr": optimizer.param_groups[0]['lr'],
-                   "SLoss": loss_synthesizer, "OHLoss": loss_oh, "CLoss": loss_contr})
+                   "SLoss": loss_synthesizer, "OHLoss": loss_oh, "CLoss": loss_contr, "ADVLoss": loss_adv})
 
         is_best = acc1 > best_acc1
         best_acc1 = max(acc1, best_acc1)
