@@ -220,7 +220,7 @@ class NAYER(BaseSynthesis):
                                             F.softmax(t_out/self.temp, dim=-1), 
                                             reduction='batchmean')
                 else:
-                    loss_contr = 0
+                    loss_contr = torch.tensor(0.0)
 
                 loss_bn = sum([h.r_feature for h in self.hooks])
                 loss_oh = custom_cross_entropy(t_out, ys.detach())
