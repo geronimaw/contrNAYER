@@ -207,10 +207,10 @@ class NAYER(BaseSynthesis):
                 else:
                     inputs_aug = self.aug(inputs)
 
-                t_out = self.teacher(inputs_aug)
+                t_out = self.teacher(inputs)
                 
                 if self.contr != 0:
-                    t_out_aug = self.teacher(inputs)
+                    t_out_aug = self.teacher(inputs_aug)
                     # I want G to synthesize samples that produce the same response on T regardless of the augmentation
                     # TODO: can semantics (inter-class similarities) be useful here?
                     if self.contr_loss == "MSE":
