@@ -43,7 +43,7 @@ parser.add_argument('--bn_mmt', default=0.9, type=float,
                     help='momentum when fitting batchnorm statistics')
 
 # CDF
-parser.add_argument('--log_tag', default='ti-r34-test')
+parser.add_argument('--log_tag', default='')
 parser.add_argument('--epochs', default=120, type=int, metavar='N',
                     help='number of total epochs to run')
 parser.add_argument('--warmup', default=1, type=int, metavar='N',
@@ -206,8 +206,9 @@ def main_worker(gpu, ngpus_per_node, args):
     ############################################
     # if args.log_tag != '':
     #     args.log_tag = '-' + args.log_tag
-    args.log_tag = f"ep{args.epochs}-contr{args.contr}-{args.contr_loss}{args.temperature}\
-        {'-new_aug' if args.new_aug else ''}"
+    if args.log_tag == '':
+        args.log_tag = f"ep{args.epochs}-contr{args.contr}-{args.contr_loss}{args.temperature}\
+            {'-new_aug' if args.new_aug else ''}"
     log_name = 'R%d-%s-%s-%s-%s' % (args.rank, args.dataset, args.teacher, args.student, args.log_tag) \
         if args.multiprocessing_distributed else '%s-%s-%s' % (args.dataset, args.teacher, args.student)
     args.logger = datafree.utils.logger.get_logger(log_name, output='checkpoints/datafree-%s/log-%s-%s-%s%s.txt'
