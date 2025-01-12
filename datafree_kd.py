@@ -115,7 +115,7 @@ parser.add_argument('--fp16', action='store_true',
                     help='use fp16')
 
 # Misc
-parser.add_argument('--seed', default=0, type=int,
+parser.add_argument('--seed', default=None, type=int,
                     help='seed for initializing training.')
 parser.add_argument('-j', '--workers', default=4, type=int, metavar='N',
                     help='number of data loading workers (default: 4)')
