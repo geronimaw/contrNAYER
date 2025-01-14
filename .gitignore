@@ -4,5 +4,7 @@ output.log
 wandb-metadata.json
 config.yaml
 copy_wandb_run.py
+results_analysis.py
 run/
 checkpoints/
+final_trainings/

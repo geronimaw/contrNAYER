@@ -135,6 +135,7 @@ parser.add_argument('--new_aug', default=False, type=bool)
 parser.add_argument('--contr_loss', default="KLD", type=str)
 parser.add_argument('--temperature', default=2, type=float)
 parser.add_argument('--contr_on_stud', default=False, type=bool)
+parser.add_argument('--hyperparams', default=None)
 
 best_acc1 = 0
 time_cost = 0
@@ -200,6 +201,14 @@ def main_worker(gpu, ngpus_per_node, args):
         args.autocast = autocast
     else:
         args.autocast = datafree.utils.dummy_ctx
+
+    ############################################
+    # HYPERPARAMETERS for consistency constraint
+    if args.hyperparams is not None:
+        args.contr_loss = args.hyperparams[0]
+        args.temperature = args.hyperparams[1]
+        args.new_aug = args.hyperparams[2]
+    ############################################
 
     ############################################
     # Logger
