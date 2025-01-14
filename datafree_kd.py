@@ -205,9 +205,11 @@ def main_worker(gpu, ngpus_per_node, args):
     ############################################
     # HYPERPARAMETERS for consistency constraint
     if args.hyperparams is not None:
-        args.contr_loss = args.hyperparams[0]
-        args.temperature = args.hyperparams[1]
-        args.new_aug = args.hyperparams[2]
+        hyperparams = args.params.split(",")
+        print(hyperparams)
+        args.contr_loss = float(hyperparams[0])
+        args.temperature = float(hyperparams[1])
+        args.new_aug = bool(hyperparams[2])
     ############################################
 
     ############################################
